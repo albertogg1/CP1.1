@@ -6,7 +6,7 @@ pipeline{
             steps{
                 // Obtener el código fuente desde el repositorio Git
                 echo 'Hello World' // Esto no es el echo del sistema operativo sino el del log de Jenkins
-                git 'https://github.com/albertogg1/CP1.1.git'
+                git 'https://github.com/albertogg1/EU_DevOps-Cloud.git'
                 bat 'dir'
                 bat 'echo %WORKSPACE%'
             }
@@ -18,32 +18,30 @@ pipeline{
             }
         }
         
-        stage('Tests'){
-            parallel{
-                stage('Unit'){
-                    steps{
-                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
-                            bat '''
-                                set PYTHONPATH=%WORKSPACE%
-                                pytest --junitxml=test\\unit\\report.xml test\\unit
-                            '''
-                        }
-                    }
-                }
 
-                stage('Service'){
-                    steps{
-                        bat '''
-                            set FLASK_APP=app\\api.py
-                            start flask run
-                            start java -jar C:\\EU_DevOps_Cloud\\ejercicios\\wiremock-standalone-3.13.2.jar --port 9090 --root-dir test\\wiremock
-                            set PYTHONPATH=%WORKSPACE%
-                            pytest --junitxml=result-rest.xml test\\rest
-                        '''
-                    }
+        stage('Unit'){
+            steps{
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
+                    bat '''
+                        set PYTHONPATH=%WORKSPACE%
+                        pytest --junitxml=test\\unit\\report.xml test\\unit
+                    '''
                 }
             }
         }
+
+        stage('Service'){
+            steps{
+                bat '''
+                    set FLASK_APP=app\\api.py
+                    start flask run
+                    start java -jar C:\\EU_DevOps_Cloud\\ejercicios\\wiremock-standalone-3.13.2.jar --port 9090 --root-dir test\\wiremock
+                    set PYTHONPATH=%WORKSPACE%
+                    pytest --junitxml=result-rest.xml test\\rest
+                '''
+            }
+        }
+
 
 
         stage('Results'){
