@@ -6,7 +6,7 @@ pipeline{
             steps{
                 // Obtener el código fuente desde el repositorio Git
                 echo 'Hello World' // Esto no es el echo del sistema operativo sino el del log de Jenkins
-                git 'https://github.com/albertogg1/EU_DevOps-Cloud.git'
+                git 'https://github.com/albertogg1/CP1.1.git'
                 bat 'dir'
                 bat 'echo %WORKSPACE%'
             }
