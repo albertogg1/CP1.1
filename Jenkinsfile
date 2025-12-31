@@ -20,6 +20,10 @@ pipeline{
         
 
         stage('Unit'){
+
+
+
+
             steps{
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
                     bat '''
@@ -36,12 +40,26 @@ pipeline{
                     set FLASK_APP=app\\api.py
                     start flask run
                     start java -jar C:\\EU_DevOps_Cloud\\ejercicios\\wiremock-standalone-3.13.2.jar --port 9090 --root-dir test\\wiremock
+
+                    echo Esperando a Flask...
+                    :wait_flask
+                    curl -s http://localhost:5000 >nul 2>&1 || (
+                        timeout /t 2 >nul
+                        goto wait_flask
+                    )
+
+                    echo Esperando a WireMock...
+                    :wait_wiremock
+                    curl -s http://localhost:9090 >nul 2>&1 || (
+                        timeout /t 2 >nul
+                        goto wait_wiremock
+                    )
+
                     set PYTHONPATH=%WORKSPACE%
                     pytest --junitxml=result-rest.xml test\\rest
                 '''
             }
         }
-
 
 
         stage('Results'){
